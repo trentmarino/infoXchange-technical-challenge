@@ -1,15 +1,24 @@
 import React, {useEffect, useState} from "react";
-import {Box, ListItem, List, Grid, Button} from "@material-ui/core";
-import {getBooks} from "../services/book";
+import {Box, ListItem, List, Grid, Button, Divider} from "@material-ui/core";
+import {getBooks, saveBook} from "../services/book";
 import {useDispatch, useSelector} from "react-redux";
 import {setBookId as setReduxBookId, setSavedStatus} from "../redux/actions/book.actions";
 import AddIcon from '@material-ui/icons/Add';
+import AddNewDialog from "./AddNewDialog";
+import {saveAuthor} from "../services/author";
 
 function BookList({props}) {
 
     const [books, setBooks] = useState([])
-    const dispatch = useDispatch();
+    const [dialogDetails, setDialogDetails] = useState({
+        title: "",
+        formType: "",
+        onSave: null,
+        dataStructure: {}
+    })
     const [bookId, setBookId] = useState(null)
+    const [showDialog, setShowDialog] = useState(false)
+    const dispatch = useDispatch();
 
     const savedBooks = useSelector(state => state.getSavedStatus.saved);
 
@@ -29,6 +38,46 @@ function BookList({props}) {
         dispatch(setReduxBookId(bookId))
     }
 
+    const closeDialog = () => {
+        setShowDialog(!showDialog)
+    }
+
+    const handleOpenDialog = (key) => {
+        switch (key) {
+            case "book":
+                setDialogDetails({
+                    ...dialogDetails,
+                    title: "Add a new book",
+                    formType: "book",
+                    onSave: saveBook,
+                    dataStructure: {
+                        name: '',
+                        isbn: '',
+                        author_id: ''
+                    }
+                });
+                break;
+            case "author":
+                setDialogDetails({
+                    ...dialogDetails,
+                    title: "Add a new Author",
+                    formType: "author",
+                    onSave: saveAuthor,
+                    dataStructure: {
+                        first_name: '',
+                        last_name: ''
+                    }
+                });
+                break;
+            default:
+                break;
+
+        }
+        setShowDialog(true);
+
+    }
+
+
     return (
         <Box elevation={1} style={{
             height: '78vh'
@@ -37,12 +86,13 @@ function BookList({props}) {
                 <Grid item>
                     <Grid container direction="row" alignContent='center' justify='space-between'>
                         <Grid item>
-                            <Button><AddIcon/> Add a new Book</Button>
+                            <Button onClick={() => handleOpenDialog('book')}><AddIcon/> Add a new Book</Button>
                         </Grid>
                         <Grid item>
-                            <Button><AddIcon/> Add a new Author</Button>
+                            <Button onClick={() => handleOpenDialog('author')}><AddIcon/> Add a new Author</Button>
                         </Grid>
                     </Grid>
+                    <Divider/>
                 </Grid>
                 <Grid item>
                     <List component="nav">
@@ -56,6 +106,11 @@ function BookList({props}) {
                     </List>
                 </Grid>
             </Grid>
+            {showDialog ? <AddNewDialog
+                open={showDialog}
+                title={dialogDetails.title}
+                dataStructure={dialogDetails.dataStructure}
+                formType={dialogDetails.formType} onSave={dialogDetails.onSave} onClose={closeDialog}/> : null}
         </Box>
     )
 }

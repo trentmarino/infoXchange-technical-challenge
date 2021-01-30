@@ -11,3 +11,8 @@ export const saveAuthor = async (data, id = undefined) => {
 
     return response.data.author;
 }
+
+export const getAuthors = async () => {
+    const response = await api.get('authors/')
+    return response.data.authors
+}

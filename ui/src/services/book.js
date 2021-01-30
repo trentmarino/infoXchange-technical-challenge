@@ -16,7 +16,7 @@ export const saveBook = async (data, id = undefined) => {
     if(id) {
         response = await api.put(`book/${id}`, data);
     } else {
-        response = await api.post(`book`, data);
+        response = await api.post(`book/`, data);
     }
     return response.data.book;
 }

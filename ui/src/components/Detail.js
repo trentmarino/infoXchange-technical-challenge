@@ -77,8 +77,8 @@ function BookDetail({props}) {
                 {!editingBook ? <Grid container direction='row' onMouseEnter={() => setShowBookEdit(true)}
                                       onMouseLeave={() => setShowBookEdit(false)}>
                     <Grid>
-                        <Typography variant={"subtitle2"}>{bookDetails.name}</Typography>
-                        <Typography variant="caption">{bookDetails.isbn}</Typography>
+                        <Typography variant={"h5"}>{bookDetails.name}</Typography>
+                        <Typography variant="caption"><b>isbn:</b> {bookDetails.isbn}</Typography>
                     </Grid>
                     <Grid>
                         {showBookEdit ? <IconButton style={{
@@ -108,11 +108,9 @@ function BookDetail({props}) {
                 </Box>)}
                 <Divider/>
                 {bookDetails.author ? <Box p={1}>
-                    <Typography variant={"h6"}>Author's Details</Typography>
+                    <Typography variant={"subtitle2"}>Author's Details</Typography>
                     {!editingAuthor ? (
-                        <Box style={{
-                            color: showAuthorEdit ? '#145fac' : 'inherit'
-                        }} onMouseEnter={() => setShowAuthorEdit(true)}
+                        <Box onMouseEnter={() => setShowAuthorEdit(true)}
                              onMouseLeave={() => setShowAuthorEdit(false)}>
                             {bookDetails.author.last_name}, {bookDetails.author.first_name}
 
