@@ -7,13 +7,14 @@ import {
     DialogContent,
     DialogTitle,
     Grid, InputLabel,
-    MenuItem, Select,
+    MenuItem, Select, Snackbar,
     TextField
 } from "@material-ui/core";
 import PropTypes from 'prop-types'
 import {useDispatch} from "react-redux";
 import {setSavedStatus} from "../redux/actions/book.actions";
 import {getAuthors} from "../services/author";
+import MuiAlert from "@material-ui/lab/Alert";
 
 function AddNewDialog(props) {
 
@@ -118,10 +119,10 @@ function AddNewDialog(props) {
         try {
             props.onSave(data);
         } catch (err) {
-            console.log(err)
+            console.log(err);
         }
-        dispatch(setSavedStatus(true))
-        props.onClose()
+        dispatch(setSavedStatus(true));
+        props.onClose(true, `Successfully created ${props.formType.toLowerCase()}`);
 
     }
 
@@ -132,7 +133,7 @@ function AddNewDialog(props) {
                 {renderForm()}
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.onClose}>
+                <Button onClick={() => props.onClose(false)}>
                     Cancel
                 </Button>
                 <Button disabled={!validateForm()} onClick={handleSave}>

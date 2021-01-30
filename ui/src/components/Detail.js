@@ -4,7 +4,7 @@ import {
     Card,
     CardContent,
     Divider, Grid,
-    IconButton, TextField,
+    IconButton, Snackbar, TextField,
     Typography
 } from "@material-ui/core";
 import {useDispatch, useSelector} from "react-redux";
@@ -14,17 +14,19 @@ import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import {saveAuthor} from "../services/author";
 import {setSavedStatus} from "../redux/actions/book.actions";
-
-function BookDetail({props}) {
+import MuiAlert from '@material-ui/lab/Alert';
+function BookDetail(props) {
 
     const [bookDetails, setBookDetails] = useState({});
     const [showAuthorEdit, setShowAuthorEdit] = useState(false);
     const [editingAuthor, setEditingAuthor] = useState(false);
     const [editingBook, setEditingBook] = useState(false);
     const [showBookEdit, setShowBookEdit] = useState(false);
-
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("Saved Successfully");
+    const [tempAuthor, setTempAuthor] = useState({});
+    const [tempBook, setTempBook] = useState({});
     const bookId = useSelector(state => state.getBookId.bookId);
-
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -60,6 +62,8 @@ function BookDetail({props}) {
         setBookDetails({...response});
         setEditingBook(false);
         setEditingAuthor(false);
+        setShowAlert(true);
+        setAlertMessage("Updated Book");
 
     }
 
@@ -67,8 +71,10 @@ function BookDetail({props}) {
         const copyOfBookDetails = {...bookDetails}
         copyOfBookDetails.author = await saveAuthor(bookDetails.author, bookDetails.author.id)
         setBookDetails({...copyOfBookDetails})
-        setEditingBook(false)
-        setEditingAuthor(false)
+        setEditingBook(false);
+        setEditingAuthor(false);
+        setAlertMessage("Updated Author");
+        setShowAlert(true);
     }
 
     return (
@@ -84,7 +90,10 @@ function BookDetail({props}) {
                         {showBookEdit ? <IconButton style={{
                             padding: 0
                         }} disableFocusRipple disableRipple size='small'
-                                                    onClick={() => setEditingBook(true)}>
+                                                    onClick={() => {
+                                                        setTempBook({...bookDetails});
+                                                        setEditingBook(true);
+                                                    }}>
                             <EditIcon fontSize='small'/>
                         </IconButton> : null}
                     </Grid>
@@ -101,13 +110,17 @@ function BookDetail({props}) {
                                        label="isbn"/>
                         </Grid>
                         <Grid item xs={4}>
-                            <IconButton onClick={() => setEditingBook(false)}><CloseIcon/></IconButton>
-                            <IconButton onClick={handleSaveBook}><CheckIcon/></IconButton>
+                            <IconButton onClick={() => {
+                                setBookDetails({...tempBook});
+                                setTempBook({});
+                                setEditingBook(false);
+                            }}><CloseIcon/></IconButton>
+                            <IconButton disabled={!bookDetails.name || !bookDetails.isbn} onClick={handleSaveBook}><CheckIcon/></IconButton>
                         </Grid>
                     </Grid>
                 </Box>)}
                 <Divider/>
-                {bookDetails.author ? <Box p={1}>
+                {bookDetails.author ? <Box>
                     <Typography variant={"subtitle2"}>Author's Details</Typography>
                     {!editingAuthor ? (
                         <Box onMouseEnter={() => setShowAuthorEdit(true)}
@@ -117,7 +130,10 @@ function BookDetail({props}) {
                             {showAuthorEdit ? <IconButton style={{
                                 padding: 0
                             }} disableFocusRipple disableRipple size='small'
-                                                          onClick={() => setEditingAuthor(true)}>
+                                                          onClick={() => {
+                                                              setTempAuthor({...bookDetails.author});
+                                                              setEditingAuthor(true);
+                                                          }}>
                                 <EditIcon fontSize='small'/>
                             </IconButton> : null}
                         </Box>) : (
@@ -134,14 +150,32 @@ function BookDetail({props}) {
                                                label="Last Name"/>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <IconButton onClick={() => setEditingAuthor(false)}><CloseIcon/></IconButton>
-                                    <IconButton onClick={handleSaveAuthor}><CheckIcon/></IconButton>
+                                    <IconButton onClick={() => {
+                                        const copyOfAuthor = {...bookDetails};
+                                        copyOfAuthor.author = tempAuthor;
+                                        setBookDetails({...copyOfAuthor});
+                                        setTempAuthor({});
+                                        setEditingAuthor(false);
+                                    }}><CloseIcon/></IconButton>
+                                    <IconButton disabled={!bookDetails.author.first_name || !bookDetails.author.last_name} onClick={handleSaveAuthor}><CheckIcon/></IconButton>
                                 </Grid>
                             </Grid>
                         </Box>)
                     }
 
                 </Box> : null}
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    open={showAlert}
+                    autoHideDuration={3000}
+                    onClose={() => setShowAlert(false)}>
+                    <MuiAlert onClose={() => setShowAlert(false)} severity="success">
+                        {alertMessage}
+                    </MuiAlert>
+                </Snackbar>
             </CardContent>
         </Card>
     )

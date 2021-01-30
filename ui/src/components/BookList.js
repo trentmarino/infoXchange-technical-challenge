@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from "react";
-import {Box, ListItem, List, Grid, Button, Divider} from "@material-ui/core";
+import {Box, ListItem, List, Grid, Button, Divider, Snackbar} from "@material-ui/core";
 import {getBooks, saveBook} from "../services/book";
 import {useDispatch, useSelector} from "react-redux";
 import {setBookId as setReduxBookId, setSavedStatus} from "../redux/actions/book.actions";
 import AddIcon from '@material-ui/icons/Add';
 import AddNewDialog from "./AddNewDialog";
 import {saveAuthor} from "../services/author";
+import MuiAlert from "@material-ui/lab/Alert";
 
 function BookList({props}) {
 
     const [books, setBooks] = useState([])
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("Created Successfully");
     const [dialogDetails, setDialogDetails] = useState({
         title: "",
         formType: "",
@@ -38,7 +41,12 @@ function BookList({props}) {
         dispatch(setReduxBookId(bookId))
     }
 
-    const closeDialog = () => {
+    const closeDialog = (alert, message) => {
+        if (alert) {
+            setAlertMessage(message)
+            setShowAlert(true);
+        }
+
         setShowDialog(!showDialog)
     }
 
@@ -106,6 +114,18 @@ function BookList({props}) {
                     </List>
                 </Grid>
             </Grid>
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+                open={showAlert}
+                autoHideDuration={3000}
+                onClose={() => setShowAlert(false)}>
+                <MuiAlert onClose={() => setShowAlert(false)} severity="success">
+                    {alertMessage}
+                </MuiAlert>
+            </Snackbar>
             {showDialog ? <AddNewDialog
                 open={showDialog}
                 title={dialogDetails.title}
