@@ -7,14 +7,13 @@ import {
     DialogContent,
     DialogTitle,
     Grid, InputLabel,
-    MenuItem, Select, Snackbar,
+    MenuItem, Select,
     TextField
 } from "@material-ui/core";
 import PropTypes from 'prop-types'
 import {useDispatch} from "react-redux";
 import {setSavedStatus} from "../redux/actions/book.actions";
 import {getAuthors} from "../services/author";
-import MuiAlert from "@material-ui/lab/Alert";
 
 function AddNewDialog(props) {
 
